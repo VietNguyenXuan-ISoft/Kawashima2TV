@@ -1,0 +1,876 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+using System.Timers;
+/// <summary>
+/// <summary>
+/// How to use Read memory : MicroserviceSLMPControllerClient.exe 192.168.0.10 2000 -r
+/// </summary>
+namespace MicroserviceSLMPControllerClient
+{
+  class Program
+  {
+    //static TcpComm.SLMPProtocol slmpProtocol1;
+
+    static Socket _clientSocket;
+    static bool connected = false;
+    static int _start_address = (-1);
+
+    static Timer timer = new Timer();
+    static string _ip_address = "";
+    static int _port = 2000;
+
+    static eBlock _eBlock = eBlock.Block_1;
+
+    static int[] data = new int[1000];
+
+
+    static void Main(string[] args)
+    {
+      
+      timer.Interval = 500;
+      timer.Elapsed += Timer_Elapsed;
+      // Have the timer fire repeated events (true is the default)
+      timer.AutoReset = true;
+      //MicroserviceSLMPControllerClient.exe 192.168.0.10 2000 -r
+
+      for (int i = 0; i < args.Length; i++)
+      {
+        Console.WriteLine($"{i}: {args[i]}");
+
+        _ip_address = (i== 0)?args[0]: _ip_address;
+        if (i == 1)
+        {
+          try
+          {
+            _port = int.Parse(args[i]);
+          }
+          catch
+          {
+
+          }
+        }
+        //
+      }
+      if (args.Length > 0)
+      {
+
+
+
+
+
+
+
+        // Start the timer
+        timer.Enabled = true;
+
+        
+
+        
+
+
+        Connect(_ip_address, _port);
+        //
+
+        //-------------------------------------------------
+        Console.WriteLine("Any key to exit ....");
+        Console.ReadLine();
+        //
+        _clientSocket.Close();
+      }
+    }
+
+
+
+    private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+      timer.Enabled = false;
+
+      if (_clientSocket != null)
+      {
+        if (_clientSocket.Connected == true)
+        {
+          if (_eBlock == eBlock.Block_1)
+          {
+            ReadsDeviceMemory_Binary_codes(PROTOCOL_UNIT._x1_WORD, "D0000", 500);
+            _eBlock = eBlock.Block_2;
+          }
+          else
+          {
+            ReadsDeviceMemory_Binary_codes(PROTOCOL_UNIT._x1_WORD, "D0500", 500);
+            _eBlock = eBlock.Block_1;
+          }
+        }
+        else
+        {
+          Connect(_ip_address, 2000);
+        }
+      }
+
+      timer.Enabled = true;
+    }
+
+
+    enum eBlock
+    {
+      Block_1,
+      Block_2
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    static void Connect(string address, int port)
+    {
+      try
+      {
+        //IPAddress ipAdd = System.Net.IPAddress.Parse(address);
+        _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //
+        IAsyncResult result = _clientSocket.BeginConnect(address, port, OnDataConnected, _clientSocket);
+
+        bool success = result.AsyncWaitHandle.WaitOne(1000, true);
+        //connected = 
+        Console.WriteLine($"Connect to {address}:  {_clientSocket.Connected}");
+      }
+      catch
+      {
+
+      }
+    }
+
+    static void OnDataConnected(IAsyncResult asyn)
+    {
+      try
+      {
+        //Packet socketData = (Socket)asyn.AsyncState;
+        if (asyn.AsyncState is Socket)
+        {
+          connected = _clientSocket.Connected;
+          Console.WriteLine($"Connect to :  {connected}");
+        }
+      }
+      catch
+      {
+
+      }
+    }
+
+
+    static void ReadsDeviceMemory_Binary_codes(PROTOCOL_UNIT protocol_unit, string start_address, int number_of_bits_in_decimal)
+    {
+      Console.WriteLine($"Start to read to {start_address},  {number_of_bits_in_decimal}");
+      //
+      start_address = start_address.Trim();
+      char device_str = start_address[0];
+      char device_str_2 = ' ';
+      if (start_address.Length > 1)
+      {
+        device_str_2 = start_address[1];
+      }
+      FX_DEVICE fx_device = convertCharToDevice(device_str, device_str_2);
+      if ((fx_device == FX_DEVICE.M) ||
+          (fx_device == FX_DEVICE.X) ||
+          (fx_device == FX_DEVICE.Y) ||
+          (fx_device == FX_DEVICE.L) ||
+          (fx_device == FX_DEVICE.D)
+          )
+      {
+        byte[] data_to_send = new byte[42];
+
+        List<byte> list_data_to_send = new List<byte>();
+
+        byte[] header_bytes = Build_Header(SLMP_HEADER.SEND_TO_PLC);
+        list_data_to_send.AddRange(header_bytes);
+
+
+        //Array.Copy(header_bytes, data_to_send, header_bytes.Length);
+
+        /* request data length: 24 bytes ==> change to Hex 0x18 ==> change to ASCII */
+        list_data_to_send.AddRange(new byte[] { 0x0C, 0x00 });
+
+        /* reserved 2 bytes */
+        list_data_to_send.AddRange(new byte[] { 0x10, 0x00 });
+
+        /* command code: 2 bytes: Device Read (Batch) 0401H - page 48*/
+        list_data_to_send.AddRange(new byte[] { 0x01, 0x04 });
+
+        /* sub_command: 2 bytes - page 49*/
+        if (protocol_unit == PROTOCOL_UNIT._x1_BIT)
+        {
+          //ASCII: 480 words (7680 points)
+          //BIN: 960 words (15360 points)
+          list_data_to_send.AddRange(new byte[] { 0x01, 0x00 });
+        }
+        else if (protocol_unit == PROTOCOL_UNIT._x16_BITS)
+        {
+          list_data_to_send.AddRange(new byte[] { 0x00, 0x00 });
+        }
+        else if (protocol_unit == PROTOCOL_UNIT._x1_WORD)
+        {
+          list_data_to_send.AddRange(new byte[] { 0x00, 0x00 });
+        }
+
+        /* Head device No: 3 bytes (start_address) - page 49, 50*/
+        /* read device in bits unit */
+        byte[] start_address_as_bytes = format_device_address_as_bytes(fx_device, start_address);
+        list_data_to_send.AddRange(start_address_as_bytes);
+
+
+        /*  Device code 1 bytes - page 46 */
+        byte device_code = get_device_code(fx_device);
+        list_data_to_send.Add(device_code);
+
+        /* 
+         * number of device will be read 
+         */
+        byte[] length_as_bytes = format_length_as_bytes(number_of_bits_in_decimal);
+        list_data_to_send.AddRange(length_as_bytes);
+        //
+        //
+        _start_address = GetAddress(start_address);
+
+        //current_data = new FX_DATA();
+        ///*saving to current_data*/
+        //if (protocol_unit == PROTOCOL_UNIT._x1_WORD)
+        //{
+        //  current_data.fx_command = FX_COMMAND.WR;
+        //}
+        //else
+        //{
+        //  current_data.fx_command = FX_COMMAND.BR;
+        //}
+        //current_data.fx_device = fx_device;
+        //current_data.address = GetAddress(start_address);
+        //current_data.value = 0xFF;
+        //current_data.protocol_unit = protocol_unit;
+        //current_data.max_device = number_of_bits_in_decimal;
+        //current_data.device_as_string = $"{fx_device}{convertAddressToString(current_data.address)}";
+
+        //WritenData_Queue.Enqueue(current_data); //Khoa_test
+        /* calling sending data */
+        SendData(list_data_to_send.ToArray()); //read device
+      }
+
+
+    }
+
+    static void WriteDeviceMemory_Binary_codes(string start_address, int[] values, int number_of_words_in_decimal)
+    {
+      /* convert string to device format 
+       * get the first character
+       *ex: M100 --> fx_device = FX_DEVICE.M
+       */
+      start_address = start_address.Trim();
+      char device_str = start_address[0];
+      char device_str_2 = ' ';
+      if (start_address.Length > 1)
+      {
+        device_str_2 = start_address[1];
+      }
+      FX_DEVICE fx_device = convertCharToDevice(device_str, device_str_2);
+
+      /* start to building data */
+      if ((fx_device == FX_DEVICE.M) ||
+        (fx_device == FX_DEVICE.X) ||
+        (fx_device == FX_DEVICE.Y) ||
+        (fx_device == FX_DEVICE.L) ||
+        (fx_device == FX_DEVICE.D)
+      )
+      {
+        PROTOCOL_UNIT protocol_unit = PROTOCOL_UNIT._x1_WORD;
+        List<byte> list_data_to_send = new List<byte>();
+        /*     * 
+         * idx = 0 --> Header 7 bytes 
+         */
+        byte[] header_bytes = Build_Header(SLMP_HEADER.SEND_TO_PLC);
+        list_data_to_send.AddRange(header_bytes);
+
+        /*
+         * idx = 7 -- request data length: 2 bytes -- see page 27; 32
+         */
+        //int number_of_byte_need = number_of_words_in_decimal * 2;
+        //int request_data_length = 6 + number_of_byte_need; /* (reserved + command + sub_command) + number_of_byte_need */
+
+        //byte request_data_length_MSB = Convert.ToByte(request_data_length >> 8);
+        //byte request_data_length_LSB = Convert.ToByte(request_data_length);
+        //list_data_to_send.AddRange(new byte[] { request_data_length_LSB, request_data_length_MSB });
+        list_data_to_send.AddRange(new byte[] {
+          0x00,
+          0x00
+        });
+        //logging list_data_to_send, this value will be calcuate again 
+        int request_data_length = list_data_to_send.Count;
+        int idx_request_data_length_LSB = (list_data_to_send.Count - 2);
+        int idx_request_data_length_MSB = (list_data_to_send.Count - 1);
+
+        /* 
+         * idx = 9 --> reserved 2 bytes - page 28
+         */
+        list_data_to_send.AddRange(new byte[] {
+          0x00,
+          0x00
+        });
+
+        /* 
+         * idx = 11 --> command code: 2 bytes: Device Write (Batch) 1401H - page 52 ;54
+         */
+        list_data_to_send.AddRange(new byte[] {
+          0x01,
+          0x14
+        });
+
+        /* 
+         * idx = 13 --> sub_command: 2 bytes - page 52 
+         */
+        byte[] sub_command = get_sub_command(PROTOCOL_UNIT._x1_WORD);
+        list_data_to_send.AddRange(sub_command);
+
+        /* idx = 15 --> Head device No: 3 bytes (start_address) - page 49, 50*/
+        /* Number of device: 2 bytes 
+         - When writing data in bit units: 1 to 1792 points ASCII  <---> 1 to 3584 points (BIN) 
+         - When writing data in word units: 1 to 480 points ASCII  <---> 1 to 960 points (BIN) 
+         */
+        byte[] start_address_as_bytes = format_device_address_as_bytes(fx_device, start_address);
+        list_data_to_send.AddRange(start_address_as_bytes);
+
+        /* idx = 18 -- Device code 1 bytes - page 46 */
+        byte device_code = get_device_code(fx_device);
+        list_data_to_send.Add(device_code);
+        /*
+         * idx = 19 --> number of devices will be written --- 2 bytes
+         */
+        byte[] length_as_bytes = format_length_as_bytes(number_of_words_in_decimal);
+        list_data_to_send.AddRange(length_as_bytes);
+
+        /*
+         *idx = 21 --> data to be written -- see page 32
+         */
+        byte[] data_tobe_written = get_bytes_from_word_data(values, number_of_words_in_decimal);
+        list_data_to_send.AddRange(data_tobe_written);
+        //
+        //adding request_data_length
+        request_data_length = list_data_to_send.Count - request_data_length;
+        byte request_data_length_MSB = Convert.ToByte(request_data_length >> 8);
+        byte request_data_length_LSB = Convert.ToByte(request_data_length);
+
+        list_data_to_send[idx_request_data_length_LSB] = request_data_length_LSB;
+        list_data_to_send[idx_request_data_length_MSB] = request_data_length_MSB;
+        //
+
+#if USE_WRITEN_VAR
+        /* saving to current_data */
+        if (protocol_unit == PROTOCOL_UNIT._x1_WORD)
+        {
+          written_data.fx_command = FX_COMMAND.WW;
+        }
+        else
+        {
+          written_data.fx_command = FX_COMMAND.BW;
+        }
+        written_data.fx_device = fx_device;
+        written_data.address = GetAddress(start_address);
+        written_data.value = 0xFF;
+        written_data.protocol_unit = protocol_unit;
+        written_data.max_device = number_of_words_in_decimal;
+#else
+        /* saving to current_data */
+        //if (protocol_unit == PROTOCOL_UNIT._x1_WORD)
+        //{
+        //  current_data.fx_command = FX_COMMAND.WR;
+        //}
+        //else
+        //{
+        //  current_data.fx_command = FX_COMMAND.BR;
+        //}
+        //current_data.fx_device = fx_device;
+        //current_data.address = GetAddress(start_address);
+        //current_data.value = 0xFF;
+        //current_data.protocol_unit = protocol_unit;
+        //current_data.max_device = number_of_words_in_decimal;
+#endif
+        /* calling sending data */
+        SendData(list_data_to_send.ToArray()); //read device
+      }
+      //else
+      //{
+      //  OnNotifyStatus_Server1(this, STATUS.WRONG_FORMAT_DEVICE_OR_DEVICE_NOT_SUPPORT);
+
+      //}
+    }
+
+    static byte[] get_bytes_from_word_data(int[] values, int data_length)
+    {
+      /* 
+       * See example Page 54
+       */
+      List<byte> list_bytes = new List<byte>();
+
+      /* start to convert */
+      for (int i = 0; i < data_length; i++)
+      {
+        byte msb = Convert.ToByte((values[i] >> 8) & 0x00FF);
+        byte lsb = Convert.ToByte(values[i] & 0x00FF);
+        //
+        list_bytes.AddRange(new byte[] { lsb, msb });
+      }
+      return list_bytes.ToArray();
+    }
+
+    static byte[] get_sub_command(PROTOCOL_UNIT protocol_unit)
+    {
+      List<byte> list_bytes = new List<byte>();
+      if (protocol_unit == PROTOCOL_UNIT._x1_BIT)
+      {
+        list_bytes.AddRange(new byte[] { 0x01, 0x00 });
+      }
+      else if (protocol_unit == PROTOCOL_UNIT._x16_BITS)
+      {
+        list_bytes.AddRange(new byte[] { 0x00, 0x00 });
+      }
+      else if (protocol_unit == PROTOCOL_UNIT._x1_WORD)
+      {
+        list_bytes.AddRange(new byte[] { 0x00, 0x00 });
+      }
+      else
+      {
+        /* do nothing */
+      }
+      return list_bytes.ToArray();
+    }
+
+    static void SendData(byte[] message)
+    {
+      //TimeSpan ts = client.LastDataFromServer
+      try
+      {
+        if (_clientSocket != null)
+        {
+          if (_clientSocket.Connected)
+          {
+            _clientSocket.Send(message);
+            WaitForData();
+          }
+        }
+      }
+      catch
+      {
+      }
+    }
+
+    static void WaitForData()
+    {
+      try
+      {
+        Packet pack = new Packet(_clientSocket);
+        _clientSocket.BeginReceive(pack.DataBuffer, 0, pack.DataBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), pack);
+      }
+
+      catch (SocketException se)
+      {
+        System.Console.WriteLine("Client EXCEPTION in WaitForData: " + se.Message);
+        //ToFile(se.Message); //error
+      }
+    }
+
+    static void OnDataReceive_Server1(byte[] data_from_plc, int messageSize)
+    {
+      bool IsSubHeader_OK = false;
+      bool IsNetwork_Number_OK = false;
+      bool IsRequest_destination_station_number_OK = false;
+      bool IsRequest_destination_module_IO_number_OK = false;
+      bool IsRequest_destination_multi_drop_station_number_OK = false;
+      bool IsEnCode_OK = false;
+      int EndCode = 0xFF;
+      int byte_idx = 0;
+      int Response_data_length = 0;
+      try
+      {
+        if (data_from_plc.Length >= 2)
+        {
+          IsSubHeader_OK = ((data_from_plc[byte_idx++] == 0xD0) && //0
+                            (data_from_plc[byte_idx++] == 0x00)); //1
+
+
+        }
+        /* Get & check sub_header */
+        if ((data_from_plc.Length >= 3) && (IsSubHeader_OK == true))
+        {
+          IsNetwork_Number_OK = ((data_from_plc[byte_idx++] == 0x00)); //2
+        }
+        /* Get & check Network_Number */
+        if ((data_from_plc.Length >= 4) && (IsNetwork_Number_OK == true))
+        {
+          IsRequest_destination_station_number_OK = ((data_from_plc[byte_idx++] == 0xFF)); //3
+        }
+        /* Get & check destination_station_number */
+        if ((data_from_plc.Length >= 6) && (IsRequest_destination_station_number_OK == true))
+        {
+          IsRequest_destination_module_IO_number_OK = ((data_from_plc[byte_idx++] == 0xFF) && //4
+                            (data_from_plc[byte_idx++] == 0x03)); //5
+        }
+        if ((data_from_plc.Length >= 7) && (IsRequest_destination_module_IO_number_OK == true))
+        {
+          IsRequest_destination_multi_drop_station_number_OK = ((data_from_plc[byte_idx++] == 0x00)); //6
+        }
+        if ((data_from_plc.Length >= 9) && (IsRequest_destination_multi_drop_station_number_OK == true))
+        {
+          byte data_length_LSB = data_from_plc[byte_idx++];//7
+          byte data_length_MSB = data_from_plc[byte_idx++];//8
+          Response_data_length = (data_length_MSB << 8) | data_length_LSB;
+        }
+
+        if (Response_data_length > 0)
+        {
+          //int uu = 0;
+          if (data_from_plc.Length >= 11)
+          {
+            byte EndCode_LSB = data_from_plc[byte_idx++];//9
+            byte EndCode_MSB = data_from_plc[byte_idx++];//10
+            EndCode = (EndCode_MSB << 8) | EndCode_LSB;
+            Response_data_length = Response_data_length - 2;
+          }
+        }
+
+        IsEnCode_OK = (EndCode == 0);
+        if (IsEnCode_OK == false)
+        {
+          /* page 29 -- Error information
+           * The request destination network number, request destination station number, request destination module I/O number, and
+            request destination multi-drop station number of the station which responded with errors are stored.
+           */
+          //error_des = FindErrorByCode(EndCode);
+        }
+        else
+        {
+          
+          if (Response_data_length > 0)
+          {
+           
+            for (int i = 0; i < Response_data_length; i += 2)
+            {
+              int value_LSB = data_from_plc[byte_idx + i];
+              int value_MSB = data_from_plc[byte_idx + (i + 1)];
+              int value_from_plc = (value_MSB << 8) | (value_LSB);
+              //
+              int data_word_idx = (i / 2);
+              //
+              int memory_address = _start_address + data_word_idx;
+              Console.WriteLine($"[D{memory_address}]: {value_from_plc}");
+
+
+
+              if (memory_address < data.Length)
+              {
+                data[memory_address] = value_from_plc;
+              }
+
+            }
+
+            //--------------------------------------------------------------------
+            try
+            {
+              string node = _ip_address; //"node1"
+              MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(node);
+              // read the integer value at position 500  
+              MemoryMappedViewAccessor accessor = mmf.CreateViewAccessor();
+
+              accessor.WriteArray(0, data, 0, data.Length);
+           
+            
+              accessor.Dispose();
+              mmf.Dispose();
+            }
+            catch
+            {
+
+            }
+
+          }
+        }
+
+      }
+      catch
+      {
+
+      }
+     
+
+    }
+
+    static void OnDataReceived(IAsyncResult asyn)
+    {
+      try
+      {
+        Packet socketData = (Packet)asyn.AsyncState;
+        int dataSize = socketData.CurrentSocket.EndReceive(asyn);
+
+        //----------------------------------------------------------
+        OnDataReceive_Server1(socketData.DataBuffer, dataSize);
+        //if (_receive != null)
+        //  _receive(socketData.DataBuffer, dataSize);
+
+        //WaitForData();
+      }
+
+      catch (ObjectDisposedException)
+      {
+        //System.Console.WriteLine("Client EXCEPTION in OnDataReceived by: ObjectDisposedException Socket has been closed");
+
+        //if (OnDisconnectedAndNeedRetries != null)
+        //{
+        //  OnDisconnectedAndNeedRetries();
+        //}
+      }
+
+      catch (SocketException se)
+      {
+        //System.Console.WriteLine("Client EXCEPTION in OnDataReceived by SocketException " + se.Message);
+        //
+        //if (OnDisconnected != null)
+        //  OnDisconnected();
+
+        //ToFile(se.Message); //error
+      }
+    }
+    //static byte[] DataBuffer = new byte[1024];
+
+    class Packet
+    {
+      public Socket CurrentSocket;
+      public byte[] DataBuffer = new byte[1024];
+
+
+      /// <summary>
+      /// Construct a Packet Object
+      /// </summary>
+      /// <param name="sock">The socket this Packet is being used on.</param>
+      /// <param name="client">The client number that this packet is from.</param>
+      public Packet(Socket sock)
+      {
+        CurrentSocket = sock;
+      }
+    }
+
+
+
+    static int GetAddress(string address)
+    {
+      string str = address.Substring(1, address.Length - 1);
+      int value = int.Parse(str);
+      return (value);
+    }
+
+
+    static byte[] format_length_as_bytes(int length)
+    {
+      byte[] bytes_ret = new byte[2];
+      bytes_ret[0] = Convert.ToByte(length & 0xFF);
+      bytes_ret[1] = Convert.ToByte((length >> 8) & 0xFF);
+      return bytes_ret;
+    }
+    static byte get_device_code(FX_DEVICE fx_device)
+    {
+      byte device_code = 0;
+      if (fx_device == FX_DEVICE.X)
+      {
+        device_code = 0x9C;
+      }
+      else if (fx_device == FX_DEVICE.Y)
+      {
+        device_code = 0x9D;
+      }
+      else if (fx_device == FX_DEVICE.M)
+      {
+        device_code = 0x90;
+      }
+      else if (fx_device == FX_DEVICE.L)
+      {
+        device_code = 0x92;
+      }
+      else if (fx_device == FX_DEVICE.D)
+      {
+        device_code = 0xA8;
+      }
+      else
+      {
+        /* do nothing */
+      }
+      return device_code;
+    }
+
+    static byte[] format_device_address_as_bytes(FX_DEVICE fx_device, string start_address)
+    {
+      byte[] bytes_ret = new byte[3];
+
+      if ((fx_device == FX_DEVICE.D) || (fx_device == FX_DEVICE.M))
+      {
+        string device_address = start_address.Substring(1);
+        int device_address_as_int = int.Parse(device_address);
+
+        int device_address_as_int_MSB = ((device_address_as_int >> 16) & 0xFFFF);
+        int device_address_as_int_LSB = device_address_as_int & 0xFFFF;
+        //
+        bytes_ret[0] = Convert.ToByte(device_address_as_int_LSB & 0xFF);
+        bytes_ret[1] = Convert.ToByte((device_address_as_int_LSB >> 8) & 0xFF);
+        bytes_ret[2] = Convert.ToByte((device_address_as_int_MSB & 0xFF));
+      }
+      return bytes_ret;
+    }
+    static byte[] Build_Header(SLMP_HEADER header_request)
+    {
+      List<byte> list_header_bytes = new List<byte>();
+      if (header_request == SLMP_HEADER.SEND_TO_PLC)
+      {
+        /* sub_header: 2 bytes */
+        list_header_bytes.Add(0x50);
+        list_header_bytes.Add(0x00);
+
+        /* page 25:
+         *  The stations of network number 240 to 255 cannot be accessed.
+            FX5CPU cannot perform multi-drop connection.
+            FX5CPU cannot perform connection via network.
+         */
+        /* network number: 1 bytes - page 24(use specification No.1 to access FX5CPU)*/
+        list_header_bytes.Add(0x00); //OK
+        /* request destination station number  - page 24(use specification No.1 to access FX5CPU)*/
+        list_header_bytes.Add(0xFF); //OK
+
+        /* request destination module I/O number - page 25 --> Own station: 0x03FF */
+        list_header_bytes.Add(0xFF); //OK
+        list_header_bytes.Add(0x03); //OK
+
+
+        /* request destination multidrop station number - page 26  -- Other than above */
+        list_header_bytes.Add(0x00); //OK
+      }
+      else if (header_request == SLMP_HEADER.RECEIVE_FROM_PLC)
+      {
+      }
+      return list_header_bytes.ToArray();
+    }
+
+    static FX_DEVICE convertCharToDevice(char deivce_as_char, char device_str_2)
+    {
+      FX_DEVICE device = FX_DEVICE.NONE;
+      if (deivce_as_char == 'M')
+      {
+        device = FX_DEVICE.M;
+      }
+      else if (deivce_as_char == 'X')
+      {
+        device = FX_DEVICE.X;
+      }
+      else if (deivce_as_char == 'Y')
+      {
+        device = FX_DEVICE.Y;
+      }
+      else if (deivce_as_char == 'D')
+      {
+        device = FX_DEVICE.D;
+      }
+      else if (deivce_as_char == 'L')
+      {
+        device = FX_DEVICE.L;
+      }
+      else if (deivce_as_char == 'T')
+      {
+        if (device_str_2 == 'S')
+        {
+          device = FX_DEVICE.TS;
+        }
+        else if (device_str_2 == 'C')
+        {
+          device = FX_DEVICE.TC;
+        }
+        else if (device_str_2 == 'C')
+        {
+          device = FX_DEVICE.TN;
+        }
+      }
+      else
+      {
+        device = FX_DEVICE.NONE;
+      }
+      return device;
+    }
+
+
+
+    enum SLMP_HEADER
+    {
+      SEND_TO_PLC,
+      RECEIVE_FROM_PLC
+    }
+
+    public enum PROTOCOL_UNIT
+    {
+      NONE,
+      _x1_BIT,
+      _x16_BITS,
+      _x1_WORD
+    }
+
+    enum FX_DEVICE
+    {
+      X = 0,
+      Y = 1,
+      M,
+      D,
+      DW,
+      L,
+      TS,
+      TC,
+      TN,
+      ACK,
+      T,
+      C,
+      /* FAIL DATA */
+      ERROR_DATA,
+      NONE,
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+    //private static void SlmpProtocol1_OnReadReadRawData(object ent, int tcpId, int lineId, byte[] datas, int length, int start_addrress, string IPAddress, int eAreaLine)
+    //{
+    //  throw new NotImplementedException();
+    //}
+
+    //private static void SlmpProtocol1_OnReadDeviceData(object ent, int tcpId, int lineId, List<TcpComm.FX_DATA> list_data, bool IsCorrectChecksum, string IPAddress, int eAreaLine)
+    //{
+    //  //throw new NotImplementedException();
+    //}
+
+    //private static void SlmpProtocol1_OnNotifyStatus(object ent, TcpComm.STATUS status, int id, int lineId, string IPAddress, int eAreaLine)
+    //{
+    //  throw new NotImplementedException();
+    //}
+  }
+}
