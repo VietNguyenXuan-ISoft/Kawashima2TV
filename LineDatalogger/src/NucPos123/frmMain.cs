@@ -68,7 +68,7 @@ namespace NucPos123
       SetupLoadConfig();
     }
 
-    
+
 
     //private void FrmMain_Load(object sender, EventArgs e)
     //{
@@ -218,82 +218,8 @@ namespace NucPos123
 
     private void ChartInit()
     {
-      // Cvt color to brush
-      System.Windows.Media.Color colorOLE = System.Windows.Media.Color.FromRgb(255, 255,255);
-      SolidColorBrush brushOLE = new SolidColorBrush(colorOLE);
-
-      //gaugeOLE.From = 0;
-      //gaugeOLE.To = 100;
-      //gaugeOLE.Foreground = brushOLE;
-      //gaugeOLE.FromColor = System.Windows.Media.Color.FromRgb(255, 255,0);
-      //gaugeOLE.ToColor = System.Windows.Media.Color.FromRgb(255, 255,0); //47, 100, 168
-      //gaugeOLE.InnerRadius = 90;
-      //gaugeOLE.IsEnabled = false;
-      //gaugeOLE.LabelsVisibility = Visibility.Hidden;
-      //gaugeOLE.La = false;
-
-
-      // Cvt color to brush
-      System.Windows.Media.Color colorOR = System.Windows.Media.Color.FromRgb(255,255,255);
-      SolidColorBrush brushOR = new SolidColorBrush(colorOR);
-
-      //gaugeOR.From = 0;
-      //gaugeOR.To = 100;
-      //gaugeOR.Foreground = brushOR;
-      //gaugeOR.FromColor = System.Windows.Media.Color.FromRgb(255,255,0); //191, 121, 144
-      //gaugeOR.ToColor = System.Windows.Media.Color.FromRgb(255,255,0); 
-      //gaugeOR.InnerRadius = 90;
-      //gaugeOR.IsEnabled = false;
-      //gaugeOR.LabelsVisibility = Visibility.Hidden;
-
-
-      //string nameProduct = "dkvdkfngd 16x200Kg sdvgdfhb";
-      ////string nameProduct = "dkvdkfngd 16x200 Kg sdvgdfhb";
-
-      ////string nameProduct = "dkvdkfngd 16x200KG sdvgdfhb";
-
-      ////string nameProduct = "dkvdkfngd 16x200Kg sdvgdfhb";
-
-      ////string nameProduct = "dkvdkfngd 16x200Kg sdvgdfhb";
-      //string a = "";
-      //string case_1 = "dkvdkfngd 16x1.5Kg sdvgdfhb";
-      //double case1 = GetWeights(case_1);
-
-      //string case_2 = "dkvdkfngd 16x1.8kg sdvgdfhb";
-      //double case2 = GetWeights(case_2);
-
-      //string case_3 = "dkvdkfngd 16x2KG sdvgdfhb";
-      //double case3 = GetWeights(case_3);
-
-      //string case_4 = "dkvdkfngd 16x5.6kG sdvgdfhb";
-      //double case4 = GetWeights(case_4);
-
-
-      //string case_5 = "dkvdkfngd 16x200g sdvgdfhb";
-      //double case5 = GetWeights(case_5);
-
-      //string case_6 = "dkvdkfngd 16x400G sdvgdfhb";
-      //double case6 = GetWeights(case_6);
-
-      //string case_7 = "dkvdkfngd 16x650 g sdvgdfhb";
-      //double case7 = GetWeights(case_7);
-
-      //string case_8 = "dkvdkfngd 16x700 g sdvgdfhb";
-      //double case8 = GetWeights(case_8);
-
-      //a += $"{case_1} => {case1} \n" +
-      //  $"{case_2} => {case2} \n" +
-      //  $"{case_3} => {case3} \n" +
-      //  $"{case_4} => {case4} \n" +
-      //  $"{case_5} => {case5} \n" +
-      //  $"{case_6} => {case6} \n" +
-      //  $"{case_7} => {case7} \n" +
-      //  $"{case_8} => {case8} \n";
-
-      //System.Windows.Forms.MessageBox.Show(a.ToString());
-
-
-
+      UpdateDataChart(gaugeOLE, 0, 95, lbProcessingValueOLE, lbTargetOLE);
+      UpdateDataChart(gaugeOR, 0, 92, lbProcessingValueOR, lbTargetOR);
     }
 
     //private double GetWeights(string nameProduct)
@@ -387,7 +313,7 @@ namespace NucPos123
 
     }
 
-    public void UpdateDataChart(Chart name_chart,double process_value, double set_point, Label name_lable_processing_value, Label name_lable_target_value)
+    public void UpdateDataChart(Chart name_chart,double process_value, int set_point, Label name_lable_processing_value, Label name_lable_target_value)
     {
       name_chart.Series.Clear();
       Series series = new Series("Series");
@@ -408,39 +334,35 @@ namespace NucPos123
       series.Points.Add(point_other);
       series.Points.Add(point_delete);
 
-      // Dislay color series
-      point_PV.Color = (process_value < set_point) ? Color.FromArgb(255, 255, 0) : Color.FromArgb(0, 255, 0);
-      point_SP.Color = Color.FromArgb(0, 255, 0);
-      point_other.Color = Color.FromArgb(10, 50, 119);
-      point_delete.Color = Color.Transparent;
-
       name_chart.Series.Add(series);
       name_chart.Series["Series"]["PieStartAngle"] = "180";
-      name_chart.Series["Series"]["DoughnutRadius"] = "30"; //Thay đổi độ rộng chart
+      name_chart.Series["Series"]["DoughnutRadius"] = "40"; //Thay đổi độ rộng chart
 
       name_lable_processing_value.Text = $"{process_value}%";
       name_lable_target_value.Text = $"Target: {set_point}%";
+
+      // Dislay color series
+      point_PV.Color = name_lable_processing_value.ForeColor = (process_value < set_point) ? Color.FromArgb(255, 255, 0) : Color.FromArgb(0, 255, 0);
+      point_SP.Color = Color.FromArgb(202, 225, 255);
+      point_other.Color = Color.FromArgb(10, 50, 119);
+      point_delete.Color = Color.Transparent;
     }
 
     private void tmrDateTime_Tick(object sender, EventArgs e)
     {
       tmrDateTime.Stop();
 
-      Random rd = new Random();
-      double a = Math.Round(rd.NextDouble() * 100, 0);
-      double b = Math.Round(rd.NextDouble() * 100, 0);
-      //lbOLETarget.Text = "90%";
-      //lbORTarget.Text = "70%";
+      //Random rd = new Random();
+      //double a = Math.Round(rd.NextDouble() * 100, 0);
+      //double b = Math.Round(rd.NextDouble() * 100, 0);
+      ////lbOLETarget.Text = "90%";
+      ////lbORTarget.Text = "70%";
 
-      //UpdateGaugeValue(gaugeOLE, a, 90, lbCurrentOLE);
-      //UpdateGaugeValue(gaugeOR, b, 70, lbCurrentOR);
+      ////UpdateGaugeValue(gaugeOLE, a, 90, lbCurrentOLE);
+      ////UpdateGaugeValue(gaugeOR, b, 70, lbCurrentOR);
 
-      UpdateDataChart(gaugeOLE, a, 77, lbProcessingValueOLE, lbTargetOLE);
-      UpdateDataChart(gaugeOR, b, 85, lbProcessingValueOR, lbTargetOR);
-
-
-
-
+      //UpdateDataChart(gaugeOLE, a, 77, lbProcessingValueOLE, lbTargetOLE);
+      //UpdateDataChart(gaugeOR, b, 85, lbProcessingValueOR, lbTargetOR);
 
       DateTime dateSafety = ConverStrToDateTime(Properties.Settings.Default.SafetyDay);
       DateTime dateQuality = ConverStrToDateTime(Properties.Settings.Default.QualityDay);

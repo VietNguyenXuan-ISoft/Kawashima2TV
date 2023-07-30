@@ -274,7 +274,7 @@
       this.lbOperator.Name = "lbOperator";
       this.lbOperator.Size = new System.Drawing.Size(273, 57);
       this.lbOperator.TabIndex = 5;
-      this.lbOperator.Text = "Nguyễn Văn A";
+      this.lbOperator.Text = "...";
       this.lbOperator.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
       // 
       // tableLayoutPanel6
@@ -355,8 +355,8 @@
       this.tableLayoutPanel13.Margin = new System.Windows.Forms.Padding(0);
       this.tableLayoutPanel13.Name = "tableLayoutPanel13";
       this.tableLayoutPanel13.RowCount = 2;
-      this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.466667F));
-      this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 92.53333F));
+      this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.6F));
+      this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90.4F));
       this.tableLayoutPanel13.Size = new System.Drawing.Size(827, 375);
       this.tableLayoutPanel13.TabIndex = 5;
       this.tableLayoutPanel13.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel13_Paint);
@@ -367,12 +367,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.label3.AutoSize = true;
-      this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+      this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.label3.ForeColor = System.Drawing.Color.White;
-      this.label3.Location = new System.Drawing.Point(0, 0);
-      this.label3.Margin = new System.Windows.Forms.Padding(0);
+      this.label3.Location = new System.Drawing.Point(0, 5);
+      this.label3.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
       this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(413, 28);
+      this.label3.Size = new System.Drawing.Size(413, 31);
       this.label3.TabIndex = 10;
       this.label3.Text = "OLE";
       this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -383,12 +383,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.label4.AutoSize = true;
-      this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+      this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.label4.ForeColor = System.Drawing.Color.White;
-      this.label4.Location = new System.Drawing.Point(413, 0);
-      this.label4.Margin = new System.Windows.Forms.Padding(0);
+      this.label4.Location = new System.Drawing.Point(413, 5);
+      this.label4.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
       this.label4.Name = "label4";
-      this.label4.Size = new System.Drawing.Size(413, 28);
+      this.label4.Size = new System.Drawing.Size(413, 31);
       this.label4.TabIndex = 11;
       this.label4.Text = "OR";
       this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -399,10 +399,10 @@
       this.panel1.Controls.Add(this.lbProcessingValueOR);
       this.panel1.Controls.Add(this.gaugeOR);
       this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.panel1.Location = new System.Drawing.Point(413, 28);
+      this.panel1.Location = new System.Drawing.Point(413, 36);
       this.panel1.Margin = new System.Windows.Forms.Padding(0);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(413, 347);
+      this.panel1.Size = new System.Drawing.Size(413, 339);
       this.panel1.TabIndex = 12;
       // 
       // lbTargetOR
@@ -424,7 +424,7 @@
       this.lbProcessingValueOR.BackColor = System.Drawing.Color.Transparent;
       this.lbProcessingValueOR.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbProcessingValueOR.ForeColor = System.Drawing.Color.White;
-      this.lbProcessingValueOR.Location = new System.Drawing.Point(163, 141);
+      this.lbProcessingValueOR.Location = new System.Drawing.Point(163, 129);
       this.lbProcessingValueOR.Margin = new System.Windows.Forms.Padding(0);
       this.lbProcessingValueOR.Name = "lbProcessingValueOR";
       this.lbProcessingValueOR.Size = new System.Drawing.Size(109, 39);
@@ -455,7 +455,7 @@
       series1.Legend = "Legend1";
       series1.Name = "Series1";
       this.gaugeOR.Series.Add(series1);
-      this.gaugeOR.Size = new System.Drawing.Size(413, 347);
+      this.gaugeOR.Size = new System.Drawing.Size(413, 339);
       this.gaugeOR.TabIndex = 15;
       this.gaugeOR.Text = "chart2";
       // 
@@ -465,10 +465,10 @@
       this.panel3.Controls.Add(this.lbProcessingValueOLE);
       this.panel3.Controls.Add(this.gaugeOLE);
       this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.panel3.Location = new System.Drawing.Point(0, 28);
+      this.panel3.Location = new System.Drawing.Point(0, 36);
       this.panel3.Margin = new System.Windows.Forms.Padding(0);
       this.panel3.Name = "panel3";
-      this.panel3.Size = new System.Drawing.Size(413, 347);
+      this.panel3.Size = new System.Drawing.Size(413, 339);
       this.panel3.TabIndex = 13;
       // 
       // lbTargetOLE
@@ -490,7 +490,7 @@
       this.lbProcessingValueOLE.BackColor = System.Drawing.Color.Transparent;
       this.lbProcessingValueOLE.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbProcessingValueOLE.ForeColor = System.Drawing.Color.White;
-      this.lbProcessingValueOLE.Location = new System.Drawing.Point(160, 141);
+      this.lbProcessingValueOLE.Location = new System.Drawing.Point(160, 129);
       this.lbProcessingValueOLE.Margin = new System.Windows.Forms.Padding(0);
       this.lbProcessingValueOLE.Name = "lbProcessingValueOLE";
       this.lbProcessingValueOLE.Size = new System.Drawing.Size(109, 39);
@@ -521,7 +521,7 @@
       series2.Legend = "Legend1";
       series2.Name = "Series1";
       this.gaugeOLE.Series.Add(series2);
-      this.gaugeOLE.Size = new System.Drawing.Size(413, 347);
+      this.gaugeOLE.Size = new System.Drawing.Size(413, 339);
       this.gaugeOLE.TabIndex = 14;
       this.gaugeOLE.Text = "chart2";
       // 
@@ -767,16 +767,16 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.tableLayoutPanel12.ColumnCount = 10;
-      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 23.66898F));
+      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 23.60515F));
       this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.457081F));
-      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 2.414163F));
-      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 2.038627F));
+      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.92918F));
       this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.51073F));
       this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 2.092275F));
       this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 19.95708F));
-      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.349785F));
-      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 2.360515F));
-      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 14.52546F));
+      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.403433F));
+      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.984979F));
+      this.tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.02146F));
       this.tableLayoutPanel12.Controls.Add(this.lbFillerSFGs, 1, 1);
       this.tableLayoutPanel12.Controls.Add(this.lbFillerPM, 1, 3);
       this.tableLayoutPanel12.Controls.Add(this.lbPackerSFGs, 4, 1);
@@ -805,7 +805,7 @@
       this.lbFillerSFGs.AutoSize = true;
       this.lbFillerSFGs.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbFillerSFGs.ForeColor = System.Drawing.Color.White;
-      this.lbFillerSFGs.Location = new System.Drawing.Point(449, 38);
+      this.lbFillerSFGs.Location = new System.Drawing.Point(448, 38);
       this.lbFillerSFGs.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
       this.lbFillerSFGs.Name = "lbFillerSFGs";
       this.lbFillerSFGs.Size = new System.Drawing.Size(123, 29);
@@ -821,7 +821,7 @@
       this.lbFillerPM.AutoSize = true;
       this.lbFillerPM.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbFillerPM.ForeColor = System.Drawing.Color.White;
-      this.lbFillerPM.Location = new System.Drawing.Point(449, 75);
+      this.lbFillerPM.Location = new System.Drawing.Point(448, 75);
       this.lbFillerPM.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
       this.lbFillerPM.Name = "lbFillerPM";
       this.lbFillerPM.Size = new System.Drawing.Size(123, 27);
@@ -837,7 +837,7 @@
       this.lbPackerSFGs.AutoSize = true;
       this.lbPackerSFGs.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbPackerSFGs.ForeColor = System.Drawing.Color.White;
-      this.lbPackerSFGs.Location = new System.Drawing.Point(866, 38);
+      this.lbPackerSFGs.Location = new System.Drawing.Point(865, 38);
       this.lbPackerSFGs.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
       this.lbPackerSFGs.Name = "lbPackerSFGs";
       this.lbPackerSFGs.Size = new System.Drawing.Size(124, 29);
@@ -853,7 +853,7 @@
       this.lbPackerPM.AutoSize = true;
       this.lbPackerPM.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbPackerPM.ForeColor = System.Drawing.Color.White;
-      this.lbPackerPM.Location = new System.Drawing.Point(866, 75);
+      this.lbPackerPM.Location = new System.Drawing.Point(865, 75);
       this.lbPackerPM.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
       this.lbPackerPM.Name = "lbPackerPM";
       this.lbPackerPM.Size = new System.Drawing.Size(124, 27);
@@ -869,10 +869,10 @@
       this.lbErectorPM.AutoSize = true;
       this.lbErectorPM.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
       this.lbErectorPM.ForeColor = System.Drawing.Color.White;
-      this.lbErectorPM.Location = new System.Drawing.Point(1417, 38);
+      this.lbErectorPM.Location = new System.Drawing.Point(1416, 38);
       this.lbErectorPM.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
       this.lbErectorPM.Name = "lbErectorPM";
-      this.lbErectorPM.Size = new System.Drawing.Size(121, 29);
+      this.lbErectorPM.Size = new System.Drawing.Size(122, 29);
       this.lbErectorPM.TabIndex = 11;
       this.lbErectorPM.Text = "0";
       this.lbErectorPM.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -883,7 +883,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.ptbPacker.Image = ((System.Drawing.Image)(resources.GetObject("ptbPacker.Image")));
-      this.ptbPacker.Location = new System.Drawing.Point(998, 0);
+      this.ptbPacker.Location = new System.Drawing.Point(997, 0);
       this.ptbPacker.Margin = new System.Windows.Forms.Padding(0);
       this.ptbPacker.Name = "ptbPacker";
       this.ptbPacker.Size = new System.Drawing.Size(39, 38);
@@ -900,7 +900,7 @@
       this.ptbErector.Location = new System.Drawing.Point(1546, 0);
       this.ptbErector.Margin = new System.Windows.Forms.Padding(0);
       this.ptbErector.Name = "ptbErector";
-      this.ptbErector.Size = new System.Drawing.Size(44, 38);
+      this.ptbErector.Size = new System.Drawing.Size(37, 38);
       this.ptbErector.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
       this.ptbErector.TabIndex = 14;
       this.ptbErector.TabStop = false;
@@ -911,10 +911,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.ptbFill.Image = ((System.Drawing.Image)(resources.GetObject("ptbFill.Image")));
-      this.ptbFill.Location = new System.Drawing.Point(580, 0);
+      this.ptbFill.Location = new System.Drawing.Point(579, 0);
       this.ptbFill.Margin = new System.Windows.Forms.Padding(0);
       this.ptbFill.Name = "ptbFill";
-      this.ptbFill.Size = new System.Drawing.Size(45, 38);
+      this.ptbFill.Size = new System.Drawing.Size(38, 38);
       this.ptbFill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
       this.ptbFill.TabIndex = 12;
       this.ptbFill.TabStop = false;

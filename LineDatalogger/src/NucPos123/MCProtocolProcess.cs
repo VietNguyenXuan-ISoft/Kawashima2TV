@@ -210,6 +210,8 @@ namespace NucPos123
     double PM;
     double CUC;
     double loss;
+    double OLE = 0;
+    double OR = 0;
 
 
     private double _previousCounterOUT = -1;
@@ -425,7 +427,7 @@ namespace NucPos123
 
               //--- Calcuate OLE
               double nominalSpeed_as_double = (double)(nominalSpeed * 60 * LT);
-              double OLE = 0;
+              
               if (nominalSpeed_as_double > 0)
               {
                 OLE = (int)(((double)CounterOUT / nominalSpeed_as_double) * 100);
@@ -440,7 +442,7 @@ namespace NucPos123
               }
 
               //--- Calcuate OR
-              double OR = 0;
+              
               if (dataPlan > 0)
               {
                 OR = (int)(((double)CounterOUTFill / dataPlan) * 100);
@@ -480,175 +482,166 @@ namespace NucPos123
                 SetCounterOutInvoke(this.lbFillerPM, this.lbFillerSFGs, CUC, PM);
                 SetStatusMachine(StateMachine, this.ptbFill);
               }
-            
-              else if (blockIdex == 5)
+            }
+            else if (blockIdex == 5)
+            {
+              SetCounterOutInvoke(this.lbPackerPM, this.lbPackerSFGs, CUC, PM);
+              SetStatusMachine(StateMachine, this.ptbPacker);
+            }
+            else if (blockIdex == 6)
+            {
+              this.lbErectorPM.Text = PM.ToString();
+              SetStatusMachine(StateMachine, this.ptbErector);
+            }
+
+            else if (blockIdex == 7)
+            {
+              ushort[] plan = new ushort[10];
+              for (int i = 0; i < 10; i++)
               {
-                SetCounterOutInvoke(this.lbPackerPM, this.lbPackerSFGs, CUC, PM);
-                SetStatusMachine(StateMachine, this.ptbPacker);
+                plan[i] = (ushort)data[i]; // Chuyển đổi từ int sang ushort
               }
-              else if (blockIdex == 6)
+              int[] intPlan = Array.ConvertAll(plan, item => (int)item);
+
+
+              dataPlan = (ushort)data[0] + (ushort)data[1] * 65536;
+              if (lblTarget.Text != dataPlan.ToString() && dataPlan >= 0)
               {
-                this.lbErectorPM.Text = PM.ToString();
-                SetStatusMachine(StateMachine, this.ptbErector);
-              }
-
-              else if (blockIdex == 7)
-              {
-                ushort[] plan = new ushort[10];
-                for (int i = 0; i < 10; i++)
-                {
-                  plan[i] = (ushort)data[i]; // Chuyển đổi từ int sang ushort
-                }
-                int[] intPlan = Array.ConvertAll(plan, item => (int)item);
-
-
-                dataPlan = (ushort)data[0] + (ushort)data[1] * 65536;
-                if (lblTarget.Text != dataPlan.ToString() && dataPlan >= 0)
-                {
-                  lblTarget.Text = dataPlan.ToString();
-                }
-              }
-              else if (blockIdex == 8)
-              {
-                codeProduct = new int[10];
-                for (int i = 0; i < codeProduct.Length; i++)
-                {
-                  codeProduct[i] = data[i];
-                }
-                string sCodeProduct = ConvertIntArrayToString(codeProduct);
-
-                if (lbCodeProduct.Text != sCodeProduct)
-                {
-                  lbCodeProduct.Text = sCodeProduct;
-                }
-
-              }
-              else if (blockIdex == 9)
-              {
-                nameStaff = new int[20];
-                for (int i = 0; i < nameStaff.Length; i++)
-                {
-                  nameStaff[i] = data[i];
-                }
-                string sNameStaff = ConvertIntArrayToString(nameStaff);
-
-                if (lbOperator.Text != sNameStaff)
-                {
-                  lbOperator.Text = sNameStaff;
-                }
-
-              }
-              else if (blockIdex == 10)
-              {
-                qualityDay = new int[10];
-                for (int i = 0; i < qualityDay.Length; i++)
-                {
-                  qualityDay[i] = data[i];
-                }
-                //string stitle_pre = ConvertIntArrayToString(dataPlan);
-                dataQualityDay = qualityDay[0];
-
-                if (lblQualityDay.Text != dataQualityDay.ToString())
-                {
-                  lblQualityDay.Text = dataQualityDay.ToString();
-                  Properties.Settings.Default.NumbersQuality = dataQualityDay;
-                  Properties.Settings.Default.Save();
-                }
-
-              }
-              else if (blockIdex == 11)
-              {
-                safetyDay = new int[10];
-                for (int i = 0; i < safetyDay.Length; i++)
-                {
-                  safetyDay[i] = data[i];
-                }
-                //string stitle_pre = ConvertIntArrayToString(dataPlan);
-                dataSafetyDay = safetyDay[0];
-
-                if (lblSafetyDay.Text != dataSafetyDay.ToString())
-                {
-                  lblSafetyDay.Text = dataSafetyDay.ToString();
-                  Properties.Settings.Default.NumbersSafety = dataSafetyDay;
-                  Properties.Settings.Default.Save();
-                }
-
-              }
-
-              else if (blockIdex == 12)
-              {
-                OLETarget = new int[5];
-                for (int i = 0; i < OLETarget.Length; i++)
-                {
-                  OLETarget[i] = data[i];
-                }
-                //string stitle_pre = ConvertIntArrayToString(dataPlan);
-                dataOLETarger = OLETarget[0];
-                //if (lbOLETarget.Text != $"{dataOLETarger.ToString()}%")
-                //{
-                //  lbOLETarget.Text = $"{dataOLETarger.ToString()}%";
-                //}
-
-              }
-              else if (blockIdex == 13)
-              {
-                ORTarget = new int[5];
-                for (int i = 0; i < ORTarget.Length; i++)
-                {
-                  ORTarget[i] = data[i];
-                }
-                //string stitle_pre = ConvertIntArrayToString(dataPlan);
-                dataORTarger = ORTarget[0];
-                //if (lbORTarget.Text != $"{dataORTarger.ToString()}%")
-                //{
-                //  lbORTarget.Text = $"{dataORTarger.ToString()}%";
-                //}
-
-              }
-              else if (blockIdex == 14)
-              {
-                titleProduct = new int[60];
-                for (int i = 0; i < titleProduct.Length; i++)
-                {
-                  titleProduct[i] = data[i];
-                }
-                string stitle_pre = ConvertIntArrayToString(titleProduct);
-                //string stitle_g = GetWeight(stitle_pre);
-
-                try
-                {
-                  //dataWeiger = int.Parse(stitle_g);
-                  dataWeiger = GetWeights(stitle_pre);
-                }
-                catch (Exception)
-                {
-                }
-
-                if (this.lnNameProduct.Text != stitle_pre)
-                {
-                  this.lnNameProduct.Text = stitle_pre;
-                }
-              }
-              // Nominal Speed
-              else if (blockIdex == 15)
-              {
-                NominalSPeed = new int[5];
-                for (int i = 0; i < NominalSPeed.Length; i++)
-                {
-                  NominalSPeed[i] = data[i];
-                }
-                if (nominalSpeed != NominalSPeed[0])
-                {
-                  nominalSpeed = NominalSPeed[0];
-                }
-                if (nominalSpeed <= 0)
-                {
-                  nominalSpeed = 45;
-                }
-
-
+                lblTarget.Text = dataPlan.ToString();
               }
             }
+            else if (blockIdex == 8)
+            {
+              codeProduct = new int[10];
+              for (int i = 0; i < codeProduct.Length; i++)
+              {
+                codeProduct[i] = data[i];
+              }
+              string sCodeProduct = ConvertIntArrayToString(codeProduct);
+
+              if (lbCodeProduct.Text != sCodeProduct)
+              {
+                lbCodeProduct.Text = sCodeProduct;
+              }
+
+            }
+            else if (blockIdex == 9)
+            {
+              nameStaff = new int[20];
+              for (int i = 0; i < nameStaff.Length; i++)
+              {
+                nameStaff[i] = data[i];
+              }
+              string sNameStaff = ConvertIntArrayToString(nameStaff);
+
+              if (lbOperator.Text != sNameStaff)
+              {
+                lbOperator.Text = sNameStaff;
+              }
+
+            }
+            else if (blockIdex == 10)
+            {
+              qualityDay = new int[10];
+              for (int i = 0; i < qualityDay.Length; i++)
+              {
+                qualityDay[i] = data[i];
+              }
+              //string stitle_pre = ConvertIntArrayToString(dataPlan);
+              dataQualityDay = qualityDay[0];
+
+              if (lblQualityDay.Text != dataQualityDay.ToString())
+              {
+                lblQualityDay.Text = dataQualityDay.ToString();
+                Properties.Settings.Default.NumbersQuality = dataQualityDay;
+                Properties.Settings.Default.Save();
+              }
+
+            }
+            else if (blockIdex == 11)
+            {
+              safetyDay = new int[10];
+              for (int i = 0; i < safetyDay.Length; i++)
+              {
+                safetyDay[i] = data[i];
+              }
+              //string stitle_pre = ConvertIntArrayToString(dataPlan);
+              dataSafetyDay = safetyDay[0];
+
+              if (lblSafetyDay.Text != dataSafetyDay.ToString())
+              {
+                lblSafetyDay.Text = dataSafetyDay.ToString();
+                Properties.Settings.Default.NumbersSafety = dataSafetyDay;
+                Properties.Settings.Default.Save();
+              }
+
+            }
+
+            else if (blockIdex == 12)
+            {
+              OLETarget = new int[5];
+              for (int i = 0; i < OLETarget.Length; i++)
+              {
+                OLETarget[i] = data[i];
+              }
+              //string stitle_pre = ConvertIntArrayToString(dataPlan);
+              dataOLETarger = OLETarget[0];
+              UpdateDataChart(gaugeOLE, OLE, dataOLETarger, lbProcessingValueOLE, lbTargetOLE);
+
+            }
+            else if (blockIdex == 13)
+            {
+              ORTarget = new int[5];
+              for (int i = 0; i < ORTarget.Length; i++)
+              {
+                ORTarget[i] = data[i];
+              }
+              //string stitle_pre = ConvertIntArrayToString(dataPlan);
+              dataORTarger = ORTarget[0];
+              UpdateDataChart(gaugeOR, OR, dataORTarger, lbProcessingValueOR, lbTargetOR);
+
+            }
+            else if (blockIdex == 14)
+            {
+              titleProduct = new int[60];
+              for (int i = 0; i < titleProduct.Length; i++)
+              {
+                titleProduct[i] = data[i];
+              }
+              string stitle_pre = ConvertIntArrayToString(titleProduct);
+              //string stitle_g = GetWeight(stitle_pre);
+
+              try
+              {
+                //dataWeiger = int.Parse(stitle_g);
+                dataWeiger = GetWeights(stitle_pre);
+              }
+              catch (Exception)
+              {
+              }
+
+              if (this.lnNameProduct.Text != stitle_pre)
+              {
+                this.lnNameProduct.Text = stitle_pre;
+              }
+            }
+            // Nominal Speed
+            else if (blockIdex == 15)
+            {
+              NominalSPeed = new int[5];
+              for (int i = 0; i < NominalSPeed.Length; i++)
+              {
+                NominalSPeed[i] = data[i];
+              }
+              nominalSpeed = NominalSPeed[0];
+              if (nominalSpeed <= 0)
+              {
+                nominalSpeed = 45;
+              }
+
+
+            }
+            
           }
           catch (Exception ex)
           {
