@@ -43,7 +43,6 @@ namespace NucPos123
         PlcMcProtocolController.PlcController plcController = new PlcMcProtocolController.PlcController(configuration.PLC_IPAddress, configuration.Port);
         plcController.OnSendDataReceived += PlcController_OnSendDataReceived;
 
-
         List<DeviceBlock> deviceBlocks = new List<DeviceBlock>() { new DeviceBlock(DeviceType.D, 300, 30), //1
                                                                   new DeviceBlock(DeviceType.D, 330, 30), // 2
                                                                   new DeviceBlock(DeviceType.D, 360, 30), // 3
@@ -106,21 +105,35 @@ namespace NucPos123
     private double _last_status = 0;
     private void SetStatusMachine(double status, PictureBox pictureBox)
     {
-      if (_last_status != status)
+      //if (_last_status != status)
+      //{
+      //  _last_status = status;
+      //  switch (status)
+      //  {
+      //    case 0:
+      //      pictureBox.Image = new Bitmap(Properties.Resources.Wating);
+      //      break;
+      //    case 1:
+      //      pictureBox.Image = new Bitmap(Properties.Resources.Run);
+      //      break;
+      //    case 2:
+      //      pictureBox.Image = new Bitmap(Properties.Resources.Stop);
+      //      break;
+      //  }
+      //}
+
+      _last_status = status;
+      switch (status)
       {
-        _last_status = status;
-        switch (status)
-        {
-          case 0:
+        case 0:
             pictureBox.Image = new Bitmap(Properties.Resources.Wating);
             break;
-          case 1:
+        case 1:
             pictureBox.Image = new Bitmap(Properties.Resources.Run);
             break;
-          case 2:
+        case 2:
             pictureBox.Image = new Bitmap(Properties.Resources.Stop);
             break;
-        }
       }
     }
 
@@ -285,14 +298,14 @@ namespace NucPos123
 
             else if (blockIdex == 5)
             {
-              SetCounterOutInvoke(this.lbPackerPM, this.lbPackerSFGs, CUC, PM);
+              SetCounterOutInvoke(this.lbErectorPM, this.lbPackerSFGs, CUC, PM);
               //SetStatusMachine(StateMachine, this.ptbPacker);
             }
             else if (blockIdex == 6)
             {
-              if (this.lbErectorPM.Text != PM.ToString())
+              if (this.lbPackerPM.Text != PM.ToString())
               {
-                this.lbErectorPM.Text = PM.ToString();
+                this.lbPackerPM.Text = PM.ToString();
               }
               //SetStatusMachine(StateMachine, this.ptbErector);
             }
@@ -485,12 +498,12 @@ namespace NucPos123
             }
             else if (blockIdex == 5)
             {
-              SetCounterOutInvoke(this.lbPackerPM, this.lbPackerSFGs, CUC, PM);
+              SetCounterOutInvoke(this.lbErectorPM, this.lbPackerSFGs, CUC, PM);
               SetStatusMachine(StateMachine, this.ptbPacker);
             }
             else if (blockIdex == 6)
             {
-              this.lbErectorPM.Text = PM.ToString();
+              this.lbPackerPM.Text = PM.ToString();
               SetStatusMachine(StateMachine, this.ptbErector);
             }
 

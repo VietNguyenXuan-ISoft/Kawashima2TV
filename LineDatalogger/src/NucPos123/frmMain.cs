@@ -344,7 +344,7 @@ namespace NucPos123
       // Dislay color series
       point_PV.Color = name_lable_processing_value.ForeColor = (process_value < set_point) ? Color.FromArgb(255, 255, 0) : Color.FromArgb(0, 255, 0);
       point_SP.Color = Color.FromArgb(202, 225, 255);
-      point_other.Color = Color.FromArgb(10, 50, 119);
+      point_other.Color = Color.FromArgb(119, 160, 183);//232 232 232     10, 50, 119
       point_delete.Color = Color.Transparent;
     }
 
