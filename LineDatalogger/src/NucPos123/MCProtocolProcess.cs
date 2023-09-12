@@ -76,6 +76,9 @@ namespace NucPos123
 
     private void SetCounterOutInvoke(Label lblpm, Label lblcuc, double cuc, double pm)
     {
+      cuc = (cuc >= 0) ? cuc : -cuc;
+      pm = (pm >= 0) ? pm : -pm;
+
       cuc = cuc / 1000;
       try
       {
@@ -95,7 +98,7 @@ namespace NucPos123
         }));
 
       }
-      catch (Exception ex)
+      catch (Exception)
       {
         //Console.WriteLine(ex.ToString());
       }
@@ -228,159 +231,7 @@ namespace NucPos123
 
 
     private double _previousCounterOUT = -1;
-    private void PlcController_OnSendDataReceived_old1(string ip_address, int blockIdex, int[] data, bool isEndMachine)
-    {
-      if (this.InvokeRequired)
-      {
-        this.Invoke(new Action(() =>
-        {
-          PlcController_OnSendDataReceived(ip_address, blockIdex, data, isEndMachine);
-        }));
-        return;
-      }
-      double nominalSpeed = 50;
-      double LT = 8;
-      //this.lblDateTime.Text =
-      Configuration configuration = list_configurations.Find(x => x.PLC_IPAddress == ip_address);
-      if (configuration != null)
-      {
-        try
-        {
-          if (blockIdex == 4 || blockIdex == 5 || blockIdex == 6)
-          {
-            CounterIN = data[1] << 16 | data[0];
-
-            CounterOUT = data[3] << 16 | data[2];
-            Status = data[23];
-            MachineId = data[25];
-            StateMachine = data[28];
-
-
-
-            total = dataPlan * dataWeiger;
-
-            //------------------------------
-
-            CounterIN = (CounterIN < 0) ? (-1) * CounterIN : CounterIN;
-            CounterOUT = (CounterOUT < 0) ? (-1) * CounterOUT : CounterOUT;
-            PM = CounterIN - CounterOUT;
-            CUC = PM * dataWeiger;
-
-
-            if (blockIdex == 4)
-            {
-              CounterINFill = CounterIN;
-              pmTotal = CounterINFill - CounterOUT;
-              cucTotal = pmTotal * dataWeiger;
-              double loss = (cucTotal / total) * 100;
-              int OLE = (int)(CounterOUT / (nominalSpeed * 60 * LT)) * 100;
-
-
-
-
-
-              if (this.lbLossSFGs.Text != cucTotal.ToString())
-              {
-                this.lbLossSFGs.Text = cucTotal.ToString();
-              }
-              this.lbLossSFGs.Text = cucTotal.ToString();
-              if (this.lbLossPM.Text != $"{pmTotal.ToString()}")
-              {
-                this.lbLossPM.Text = $"{pmTotal.ToString()}";
-              }
-
-              if (CounterOUT.ToString() != this.lblActual.Text)
-              {
-                this.lblActual.Text = CounterOUT.ToString();
-              }
-             // this.lbLoss.Text = loss.ToString();
-            }
-
-            else if (blockIdex == 5)
-            {
-              SetCounterOutInvoke(this.lbErectorPM, this.lbPackerSFGs, CUC, PM);
-              //SetStatusMachine(StateMachine, this.ptbPacker);
-            }
-            else if (blockIdex == 6)
-            {
-              if (this.lbPackerPM.Text != PM.ToString())
-              {
-                this.lbPackerPM.Text = PM.ToString();
-              }
-              //SetStatusMachine(StateMachine, this.ptbErector);
-            }
-
-
-
-
-
-          }
-
-          //if (blockIdex == 4)
-          //{
-          //  CounterINFill = CounterIN;
-          //  pmTotal = CounterINFill - CounterOUT;
-          //  cucTotal = pmTotal * dataWeiger;
-          //  double loss = (cucTotal / total) * 100;
-          //  int OLE = (int)(CounterOUT / (nominalSpeed * 60 * LT)) * 100;
-
-
-
-
-
-
-          //  this.lbLossSFGs.Text = cucTotal.ToString();
-          //  this.lbLossPM.Text = pmTotal.ToString();
-          //  this.lblActual.Text = CounterOUT.ToString();
-          //  this.lbLoss.Text = loss.ToString();
-          //  UpdateGaugeValue(gaugeOLE, OLE, dataOLETarger);
-
-
-          //  //--- Calcuate OR
-          //  int OR = 0;
-          //  if (dataPlan > 0)
-          //  {
-          //    OR = (int)(((double)CounterOUT / dataPlan) * 100);
-          //    OR = (OR > 100) ? 100 : OR;
-
-          //    UpdateGaugeValue(gaugeOR, OR, dataORTarger);
-          //    this.gaugeOR.Value = OR;
-          //  }
-
-
-
-
-
-          //  SetCounterOutInvoke(this.lbFillerPM, this.lbFillerSFGs, CUC, PM);
-          //  SetStatusMachine(StateMachine, this.ptbFill);
-          //}
-          //else if (blockIdex == 5)
-          //{
-          //  SetCounterOutInvoke(this.lbPackerPM, this.lbPackerSFGs, CUC, PM);
-          //  SetStatusMachine(StateMachine, this.ptbPacker);
-          //}
-          //else if (blockIdex == 6)
-          //{
-          //  this.lbErectorPM.Text = PM.ToString();
-          //  SetStatusMachine(StateMachine, this.ptbErector);
-          //}
-
-
-
-
-
-
-
-
-
-
-        }
-        catch
-        {
-        }
-      }
-    }
-
+    
     private void PlcController_OnSendDataReceived(string ip_address, int blockIdex, int[] data, bool isEndMachine)
     {
       if (this.InvokeRequired)
@@ -498,12 +349,13 @@ namespace NucPos123
             }
             else if (blockIdex == 5)
             {
-              SetCounterOutInvoke(this.lbErectorPM, this.lbPackerSFGs, CUC, PM);
+              SetCounterOutInvoke(this.lbPackerPM, this.lbPackerSFGs, CUC, PM);
               SetStatusMachine(StateMachine, this.ptbPacker);
             }
             else if (blockIdex == 6)
             {
-              this.lbPackerPM.Text = PM.ToString();
+              
+              this.lbErectorPM.Text = ((PM>0)?PM:-PM).ToString();
               SetStatusMachine(StateMachine, this.ptbErector);
             }
 
