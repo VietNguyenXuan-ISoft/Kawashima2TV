@@ -103,6 +103,8 @@ namespace NucPos123
       }
 
       ChartInit();
+
+      label2.Visible = false;
     }
 
     private void DisplayCurrentDateAndShift()
